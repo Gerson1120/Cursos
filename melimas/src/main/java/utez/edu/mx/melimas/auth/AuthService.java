@@ -1,9 +1,6 @@
 package utez.edu.mx.melimas.auth;
 
 
-import com.utez.edu.cursos.Entity.UsuariosEntity;
-import com.utez.edu.cursos.Repository.UsuariosRepository;
-import com.utez.edu.cursos.security.token.JwtProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +9,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import utez.edu.mx.melimas.security.token.JwtProvider;
+import utez.edu.mx.melimas.user.model.UserEntity;
+import utez.edu.mx.melimas.user.model.UserReopository;
 
 @Service
 public class AuthService {
@@ -20,7 +20,7 @@ public class AuthService {
     private AuthenticationManager manager;
 
     @Autowired
-    private UsuariosRepository usuarioRepo;
+    private UserReopository reopository;
 
     @Autowired
     private JwtProvider jwtProvider;
@@ -31,10 +31,10 @@ public class AuthService {
     public ResponseEntity<?> login(LoginDto dto) {
         try {
             Authentication auth = manager.authenticate(
-                    new UsernamePasswordAuthenticationToken(dto.getCorreo(), dto.getContraseña())
+                    new UsernamePasswordAuthenticationToken(dto.getPassword(), dto.getPassword())
             );
 
-            UsuariosEntity usuario = usuarioRepo.findByCorreo(dto.getCorreo()).get();
+            UserEntity usuario = reopository.findByEmail(dto.getPassword()).get();
             String token = jwtProvider.generateToken(auth);
             return ResponseEntity.ok(new SignedDto(token, usuario));
 
@@ -43,12 +43,12 @@ public class AuthService {
         }
     }
 
-    public ResponseEntity<?> register(UsuariosEntity nuevo) {
-        if (usuarioRepo.existsByCorreo(nuevo.getCorreo()))
+    public ResponseEntity<?> register(UserEntity nuevo) {
+        if (reopository.existsByEmail(nuevo.getEmail()))
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Correo ya existe");
 
-        nuevo.setContraseña(passwordEncoder.encode(nuevo.getContraseña()));
-        nuevo.setEstado("activo");
-        return ResponseEntity.ok(usuarioRepo.save(nuevo));
+        nuevo.setPassword(passwordEncoder.encode(nuevo.getPassword()));
+        nuevo.setStatusActive(true);
+        return ResponseEntity.ok(reopository.save(nuevo));
     }
 }

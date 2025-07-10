@@ -1,31 +1,31 @@
 package utez.edu.mx.melimas.auth;
 
 public class LoginDto {
-    private String correo;
-    private String contraseña;
+    private String email;
+    private String password;
 
     public LoginDto() {
     }
 
-    public LoginDto(String correo, String contraseña) {
-        this.correo = correo;
-        this.contraseña = contraseña;
+    public LoginDto(String email, String password) {
+        this.email = email;
+        this.password = password;
     }
 
-    public String getCorreo() {
-        return correo;
+    public String getEmail() {
+        return email;
     }
 
-    public void setCorreo(String correo) {
-        this.correo = correo;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
-    public String getContraseña() {
-        return contraseña;
+    public String getPassword() {
+        return password;
     }
 
-    public void setContraseña(String contraseña) {
-        this.contraseña = contraseña;
+    public void setPassword(String password) {
+        this.password = password;
     }
 }
 

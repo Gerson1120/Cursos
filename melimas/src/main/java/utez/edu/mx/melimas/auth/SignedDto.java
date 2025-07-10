@@ -1,14 +1,14 @@
 package utez.edu.mx.melimas.auth;
 
 
-import com.utez.edu.cursos.Entity.UsuariosEntity;
+import utez.edu.mx.melimas.user.model.UserEntity;
 
 public class SignedDto {
     private String token;
     private String tokenType = "Bearer";
-    private UsuariosEntity user;
+    private UserEntity user;
 
-    public SignedDto(String token, UsuariosEntity user) {
+    public SignedDto(String token, UserEntity user) {
         this.token = token;
         this.user = user;
     }
@@ -29,11 +29,11 @@ public class SignedDto {
         this.tokenType = tokenType;
     }
 
-    public UsuariosEntity getUser() {
+    public UserEntity getUser() {
         return user;
     }
 
-    public void setUser(UsuariosEntity user) {
+    public void setUser(UserEntity user) {
         this.user = user;
     }
 }

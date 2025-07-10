@@ -1,7 +1,6 @@
 package utez.edu.mx.melimas.security.filters;
 
-import com.utez.edu.cursos.security.token.JwtProvider;
-import com.utez.edu.cursos.security.token.UserDetailsServiceImpl;
+
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,6 +11,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import utez.edu.mx.melimas.security.token.JwtProvider;
+import utez.edu.mx.melimas.security.token.UserDetailsServiceImpl;
 
 import java.io.IOException;
 

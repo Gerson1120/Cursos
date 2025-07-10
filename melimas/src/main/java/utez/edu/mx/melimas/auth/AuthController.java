@@ -1,9 +1,9 @@
 package utez.edu.mx.melimas.auth;
 
-import com.utez.edu.cursos.Entity.UsuariosEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import utez.edu.mx.melimas.user.model.UserEntity;
 
 @RestController
 @RequestMapping("/cursos/auth")
@@ -19,7 +19,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody UsuariosEntity nuevo) {
+    public ResponseEntity<?> register(@RequestBody UserEntity nuevo) {
         return authService.register(nuevo);
     }
 }
