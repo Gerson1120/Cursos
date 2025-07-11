@@ -26,10 +26,10 @@ public class UserEntity {
     @Column(name = "email", nullable = false, length = 50)
     private String email;
 
-    @Column(name = "password", nullable = false, length = 20)
+    @Column(name = "password", nullable = false, length = 255)
     private String password;
 
-    @Column(name = "isStatusActive", nullable = false, length = 255) //boolean
+    @Column(name = "isStatusActive", nullable = false) //boolean
     private boolean isStatusActive;
 
     @ManyToOne(fetch = FetchType.EAGER)

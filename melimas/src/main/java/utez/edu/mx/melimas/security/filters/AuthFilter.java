@@ -33,7 +33,7 @@ public class AuthFilter extends OncePerRequestFilter {
         System.out.println(">>> AuthFilter ejecutado: " + request.getRequestURI());
 
         String token = jwtProvider.resolveToken(request);
-
+        System.err.println("token = " + token);
         if (token == null || token.isBlank()) {
             filterChain.doFilter(request, response);
             return;

@@ -11,7 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import utez.edu.mx.melimas.security.token.JwtProvider;
 import utez.edu.mx.melimas.user.model.UserEntity;
-import utez.edu.mx.melimas.user.model.UserReopository;
+import utez.edu.mx.melimas.user.model.UserRepository;
 
 @Service
 public class AuthService {
@@ -20,7 +20,7 @@ public class AuthService {
     private AuthenticationManager manager;
 
     @Autowired
-    private UserReopository reopository;
+    private UserRepository reopository;
 
     @Autowired
     private JwtProvider jwtProvider;
@@ -31,10 +31,11 @@ public class AuthService {
     public ResponseEntity<?> login(LoginDto dto) {
         try {
             Authentication auth = manager.authenticate(
-                    new UsernamePasswordAuthenticationToken(dto.getPassword(), dto.getPassword())
+                    new UsernamePasswordAuthenticationToken(dto.getEmail(), dto.getPassword())
             );
 
-            UserEntity usuario = reopository.findByEmail(dto.getPassword()).get();
+            UserEntity usuario = reopository.findByEmail(dto.getEmail()).get();
+            System.out.println("usuario = " + usuario);
             String token = jwtProvider.generateToken(auth);
             return ResponseEntity.ok(new SignedDto(token, usuario));
 

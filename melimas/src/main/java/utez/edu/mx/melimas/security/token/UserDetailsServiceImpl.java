@@ -7,17 +7,17 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import utez.edu.mx.melimas.user.model.UserEntity;
-import utez.edu.mx.melimas.user.model.UserReopository;
+import utez.edu.mx.melimas.user.model.UserRepository;
 
 @Service
 @Transactional
 public class UserDetailsServiceImpl implements UserDetailsService {
 
 
-    final private UserReopository usuariosRepository;
+    final private UserRepository usuariosRepository;
 
     @Autowired
-    public UserDetailsServiceImpl(UserReopository usuariosRepository) {
+    public UserDetailsServiceImpl(UserRepository usuariosRepository) {
         this.usuariosRepository = usuariosRepository;
     }
 
