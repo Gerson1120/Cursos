@@ -9,6 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import utez.edu.mx.melimas.role.model.RoleEntity;
+import utez.edu.mx.melimas.role.model.RoleEnum;
 import utez.edu.mx.melimas.role.model.RoleRepository;
 import utez.edu.mx.melimas.utils.Message;
 import utez.edu.mx.melimas.utils.TypesResponse;
@@ -40,7 +41,9 @@ public class UserService {
         if (repository.existsByEmail(dto.getEmail())) {
             return new ResponseEntity<>(new Message("Correo ya registrado", null, TypesResponse.WARNING), HttpStatus.BAD_REQUEST);
         }
-        Optional<RoleEntity> role = roleRepository.findByRoleEnum(dto.getRole());
+        RoleEnum roleEnum = RoleEnum.valueOf(roleName);
+
+        Optional<RoleEntity> role = roleRepository.findByRoleEnum(roleEnum);
         if (role.isEmpty() || !role.isPresent()) {
             return new ResponseEntity<>(new Message("Rol inválido", null, TypesResponse.ERROR), HttpStatus.BAD_REQUEST);
         }
@@ -61,7 +64,7 @@ public class UserService {
         }
         log.info("El Registro exitoso");
 
-        return new ResponseEntity<>(new Message("Usuario creado", null, TypesResponse.SUCCESS), HttpStatus.OK);
+        return new ResponseEntity<>(new Message("Usuario creado", user, TypesResponse.SUCCESS), HttpStatus.OK);
 
     }
 

@@ -7,26 +7,35 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import utez.edu.mx.melimas.security.token.JwtProvider;
+import utez.edu.mx.melimas.user.model.UserDTO;
 import utez.edu.mx.melimas.user.model.UserEntity;
 import utez.edu.mx.melimas.user.model.UserRepository;
+import utez.edu.mx.melimas.user.model.UserService;
+import utez.edu.mx.melimas.utils.Message;
+import utez.edu.mx.melimas.utils.TypesResponse;
+
+import java.util.Optional;
 
 @Service
 public class AuthService {
 
-    @Autowired
-    private AuthenticationManager manager;
+    private final AuthenticationManager manager;
+
+    private final UserRepository repository;
+
+    private final JwtProvider jwtProvider;
+
+    private final UserService userService;
 
     @Autowired
-    private UserRepository reopository;
-
-    @Autowired
-    private JwtProvider jwtProvider;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    public AuthService(AuthenticationManager manager, UserRepository repository, JwtProvider jwtProvider, UserService userService) {
+        this.manager = manager;
+        this.repository = repository;
+        this.jwtProvider = jwtProvider;
+        this.userService = userService;
+    }
 
     public ResponseEntity<?> login(LoginDto dto) {
         try {
@@ -34,22 +43,29 @@ public class AuthService {
                     new UsernamePasswordAuthenticationToken(dto.getEmail(), dto.getPassword())
             );
 
-            UserEntity usuario = reopository.findByEmail(dto.getEmail()).get();
-            System.out.println("usuario = " + usuario);
+            Optional<UserEntity> optionalUser = repository.findByEmail(dto.getEmail());
+            System.out.println("usuario = " + optionalUser);
+
+            if (optionalUser.isEmpty() || !optionalUser.get().getStatusActive()) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(new Message("Usuario no encontrado o inactivo", TypesResponse.WARNING));
+            }
+
+
+            UserEntity user = optionalUser.get();
             String token = jwtProvider.generateToken(auth);
-            return ResponseEntity.ok(new SignedDto(token, usuario));
+            return ResponseEntity.ok(new SignedDto(token, user));
 
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciales inválidas");
         }
     }
 
-    public ResponseEntity<?> register(UserEntity nuevo) {
-        if (reopository.existsByEmail(nuevo.getEmail()))
+    public ResponseEntity<?> register(UserDTO dto) {
+        if (repository.existsByEmail(dto.getEmail()))
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Correo ya existe");
 
-        nuevo.setPassword(passwordEncoder.encode(nuevo.getPassword()));
-        nuevo.setStatusActive(true);
-        return ResponseEntity.ok(reopository.save(nuevo));
+
+        return userService.saveUserWithRole(dto, "STUDENT");
     }
 }

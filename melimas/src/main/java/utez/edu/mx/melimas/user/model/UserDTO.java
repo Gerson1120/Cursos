@@ -1,5 +1,6 @@
 package utez.edu.mx.melimas.user.model;
 
+
 public class UserDTO {
     private Long id;
     private String name;
@@ -26,6 +27,9 @@ public class UserDTO {
         this.email = email;
         this.password = password;
         this.role = role;
+    }
+
+    public UserDTO() {
     }
 
     public Long getId() {

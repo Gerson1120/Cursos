@@ -43,7 +43,7 @@ public class DataInitializer implements CommandLineRunner{
                     "Admin", "Test", "User",
                     "admin@gmail.com", passwordEncoder.encode("1234"),
                     true,
-                    roleRepository.findByRoleEnum(RoleEnum.ADMIN)
+                    roleRepository.findByRoleEnum(RoleEnum.ADMIN).get()
             );
             userRepository.save(admin);
         }
@@ -53,7 +53,7 @@ public class DataInitializer implements CommandLineRunner{
                     "Student", "Test", "User",
                     "student@gmail.com", passwordEncoder.encode("1234"),
                     true,
-                    roleRepository.findByRoleEnum(RoleEnum.STUDENT)
+                    roleRepository.findByRoleEnum(RoleEnum.STUDENT).get()
             );
             userRepository.save(student);
         }
@@ -63,7 +63,7 @@ public class DataInitializer implements CommandLineRunner{
                     "Teacher", "Test", "User",
                     "teacher@gmail.com", passwordEncoder.encode("1234"),
                     true,
-                    roleRepository.findByRoleEnum(RoleEnum.TEACHER)
+                    roleRepository.findByRoleEnum(RoleEnum.TEACHER).get()
             );
             userRepository.save(teacher);
         }
