@@ -15,5 +15,6 @@
 /melimas/target/
 /melimas/.idea/
 
-/melimas/servicio_test.log
-/melimas/servicio_test.log/*
+melimas/servicio_test.log*
+melimas/servicio_test.log
+*.log
