@@ -18,10 +18,10 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping("/register/student")
-    public ResponseEntity<Message> registerStudent(@RequestBody UserDTO dto) {
-        return userService.saveUserWithRole(dto, "STUDENT");
-    }
+//    @PostMapping("/register/student")
+//    public ResponseEntity<Message> registerStudent(@RequestBody UserDTO dto) {
+//        return userService.saveUserWithRole(dto, "STUDENT");
+//    }
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/register/teacher")
