@@ -3,6 +3,8 @@ package utez.edu.mx.melimas.config;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import utez.edu.mx.melimas.categories.model.CategoryEntity;
+import utez.edu.mx.melimas.categories.model.CategoryRepository;
 import utez.edu.mx.melimas.role.model.RoleEntity;
 import utez.edu.mx.melimas.role.model.RoleEnum;
 import utez.edu.mx.melimas.role.model.RoleRepository;
@@ -17,11 +19,13 @@ public class DataInitializer implements CommandLineRunner{
     private final RoleRepository roleRepository;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final CategoryRepository categoryRepository;
 
-    public DataInitializer(RoleRepository roleRepository, UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public DataInitializer(RoleRepository roleRepository, UserRepository userRepository, PasswordEncoder passwordEncoder, CategoryRepository categoryRepository) {
         this.roleRepository = roleRepository;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.categoryRepository = categoryRepository;
     }
 
     @Override
@@ -66,6 +70,16 @@ public class DataInitializer implements CommandLineRunner{
                     roleRepository.findByRoleEnum(RoleEnum.TEACHER).get()
             );
             userRepository.save(teacher);
+        }
+        createCategoryIfNotExists("Programación", "Cursos sobre Java, Python, C++");
+        createCategoryIfNotExists("Matemáticas", "Álgebra, cálculo, estadística y más");
+        createCategoryIfNotExists("Idiomas", "Inglés, francés, alemán y más");
+        createCategoryIfNotExists("Ciencia", "Física, química, biología");
+        createCategoryIfNotExists("Negocios", "Administración, finanzas, emprendimiento");
+    }
+    private void createCategoryIfNotExists(String name, String description) {
+        if (!categoryRepository.existsByName(name)) {
+            categoryRepository.save(new CategoryEntity(name, description, true));
         }
     }
 }
