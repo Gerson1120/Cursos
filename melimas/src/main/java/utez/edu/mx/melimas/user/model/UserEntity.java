@@ -1,9 +1,12 @@
 package utez.edu.mx.melimas.user.model;
 
 import jakarta.persistence.*;
+import utez.edu.mx.melimas.courses.model.CourseStudentEntity;
 import utez.edu.mx.melimas.role.model.RoleEntity;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -35,6 +38,9 @@ public class UserEntity {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "role_id", nullable = false)
     private RoleEntity role;
+
+    @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CourseStudentEntity> enrolledCourses = new ArrayList<>();
 
 
     public UserEntity() {
