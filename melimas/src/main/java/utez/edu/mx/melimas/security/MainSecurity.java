@@ -48,6 +48,8 @@ public class MainSecurity {
             "/swagger-ui/**",
             "/api/categories/",
             "/api/categories/active/",
+            "api/courses/findAll",
+            "/api/courses/findOne/**",
             "/uploads/**"
     };
 

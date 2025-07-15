@@ -3,10 +3,7 @@ package utez.edu.mx.melimas.courses.control;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import utez.edu.mx.melimas.courses.model.CourseDTO;
 import utez.edu.mx.melimas.courses.model.CourseService;
@@ -15,7 +12,8 @@ import utez.edu.mx.melimas.utils.TypesResponse;
 
 import java.io.IOException;
 
-@Service
+@RestController
+@RequestMapping("/api/courses")
 public class CourseController {
     private final CourseService courseService;
     private MultipartFile  file;
@@ -44,6 +42,41 @@ public class CourseController {
         return courseService.save(dto,file);
     }
 
+    @GetMapping("/findAll")
+    public ResponseEntity<Message> getAll() {
+        return courseService.findAll();
+    }
+
+    @GetMapping("/findOne/{id}")
+    public ResponseEntity<Message> getOne(@PathVariable Long id) {
+        return courseService.findOne(id);
+    }
+
+    @PreAuthorize("hasRole('TEACHER')")
+    @PutMapping("/update-course/{id}")
+    public ResponseEntity<Message> update(
+            @PathVariable Long id,
+            @RequestParam("name") String name,
+            @RequestParam("description") String description,
+            @RequestParam("duration") int duration,
+            @RequestParam(value = "categoryId", required = false) Long categoryId,
+            @RequestParam(value = "syllabus", required = false) String syllabus,
+            @RequestParam(value = "file", required = false) MultipartFile file
+    ) throws IOException {
+        CourseDTO dto = new CourseDTO();
+        dto.setName(name);
+        dto.setDescription(description);
+        dto.setDuration(duration);
+        dto.setSyllabus(syllabus);
+        dto.setCategoryId(categoryId);
+        return courseService.update(id, dto, file);
+    }
+
+    @PreAuthorize("hasRole('TEACHER')")
+    @DeleteMapping("/disable/{id}")
+    public ResponseEntity<Message> delete(@PathVariable Long id) {
+        return courseService.disable(id);
+    }
 
     @PreAuthorize("hasRole('ADMIN') or hasRole('TEACHER')")
     @PostMapping("/upload-image")
