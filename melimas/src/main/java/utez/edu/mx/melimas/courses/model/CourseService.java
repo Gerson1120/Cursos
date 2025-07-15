@@ -42,29 +42,38 @@ public class CourseService {
     }
 
     @Transactional(rollbackFor = SQLException.class)
-    public ResponseEntity<Message> save(CourseDTO dto) {
-        Optional<UserEntity> optionalTeacher = userRepository.findById(dto.getTeacherId());
-        if (optionalTeacher.isEmpty() || !optionalTeacher.get().getRol().getRoleEnum().name().equals("TEACHER")) {
-            return new ResponseEntity<>(new Message("Invalid or missing teacher", null, TypesResponse.WARNING), HttpStatus.BAD_REQUEST);
+    public ResponseEntity<Message> save(CourseDTO dto, MultipartFile file) throws IOException {
+        try {
+            Optional<UserEntity> optionalTeacher = userRepository.findById(dto.getTeacherId());
+            if (optionalTeacher.isEmpty() || !optionalTeacher.get().getRol().getRoleEnum().name().equals("TEACHER")) {
+                return new ResponseEntity<>(new Message("Invalid or missing teacher", null, TypesResponse.WARNING), HttpStatus.BAD_REQUEST);
+            }
+
+            CourseEntity course = new CourseEntity();
+            course.setName(dto.getName());
+            course.setDescription(dto.getDescription());
+            course.setDuration(dto.getDuration());
+            course.setImageUrl(dto.getImageUrl());
+            course.setTeacher(optionalTeacher.get());
+            course.setEnabled(true);
+
+            if (dto.getCategoryId() != null) {
+                Optional<CategoryEntity> optionalCategory = categoryRepository.findById(dto.getCategoryId());
+                optionalCategory.ifPresent(course::setCategory);
+            }
+
+            if (file != null && !file.isEmpty()) {
+                String imageUrl = saveImage(file);
+                course.setImageUrl(imageUrl);
+            }
+
+            course = courseRepository.saveAndFlush(course);
+            log.info("Course '{}' created with ID {}", course.getName(), course.getId());
+            return new ResponseEntity<>(new Message("Course created", course, TypesResponse.SUCCESS), HttpStatus.OK);
+        } catch (Exception e) {
+            log.error("Error saving course: {}", e.getMessage());
+            return new ResponseEntity<>(new Message("Error saving course", null, TypesResponse.ERROR), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
-        CourseEntity course = new CourseEntity();
-        course.setName(dto.getName());
-        course.setDescription(dto.getDescription());
-        course.setSyllabus(dto.getSyllabus());
-        course.setDuration(dto.getDuration());
-        course.setImageUrl(dto.getImageUrl());
-        course.setTeacher(optionalTeacher.get());
-        course.setEnabled(true);
-
-        if (dto.getCategoryId() != null) {
-            Optional<CategoryEntity> optionalCategory = categoryRepository.findById(dto.getCategoryId());
-            optionalCategory.ifPresent(course::setCategory);
-        }
-
-        course = courseRepository.saveAndFlush(course);
-        log.info("Course '{}' created with ID {}", course.getName(), course.getId());
-        return new ResponseEntity<>(new Message("Course created", course, TypesResponse.SUCCESS), HttpStatus.OK);
     }
 
     public String saveImage(MultipartFile file) throws IOException {

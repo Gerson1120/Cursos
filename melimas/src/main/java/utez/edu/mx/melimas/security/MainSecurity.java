@@ -47,7 +47,8 @@ public class MainSecurity {
             "/swagger-ui.html",
             "/swagger-ui/**",
             "/api/categories/",
-            "/api/categories/active/"
+            "/api/categories/active/",
+            "/uploads/**"
     };
 
     public static String[] getWHITE_LIST() {

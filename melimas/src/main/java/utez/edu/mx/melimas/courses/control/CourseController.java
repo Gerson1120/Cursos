@@ -26,9 +26,22 @@ public class CourseController {
     }
 
     @PreAuthorize("hasRole('TEACHER')")
-    @PostMapping("/")
-    public ResponseEntity<Message> create(@RequestBody CourseDTO dto) {
-        return courseService.save(dto);
+    @PostMapping("/save-course")
+    public ResponseEntity<Message> create(
+            @RequestParam("name") String name,
+            @RequestParam("description") String description,
+            @RequestParam("duration") int duration,
+            @RequestParam("teacherId") Long teacherId,
+            @RequestParam(value = "categoryId", required = false) Long categoryId,
+            @RequestParam(value = "file", required = false) MultipartFile file
+    ) throws IOException {
+        CourseDTO dto = new CourseDTO();
+        dto.setName(name);
+        dto.setDescription(description);
+        dto.setDuration(duration);
+        dto.setTeacherId(teacherId);
+        dto.setCategoryId(categoryId);
+        return courseService.save(dto,file);
     }
 
 
