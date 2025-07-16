@@ -5,16 +5,14 @@ import utez.edu.mx.melimas.courses.model.CourseStudentEntity;
 import utez.edu.mx.melimas.role.model.RoleEntity;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Table(name = "users")
 public class UserEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long user_id ;
+    private Long id;
 
 
     @Column(name = "name", nullable = false,columnDefinition = "VARCHAR(30)")
@@ -46,8 +44,8 @@ public class UserEntity {
     public UserEntity() {
     }
 
-    public UserEntity(Long user_id, String name, String lastName, String surname, String email, String password, boolean status, RoleEntity role) {
-        this.user_id = user_id;
+    public UserEntity(Long id, String name, String lastName, String surname, String email, String password, boolean status, RoleEntity role) {
+        this.id = id;
         this.name = name;
         this.lastName = lastName;
         this.surname = surname;
@@ -67,12 +65,12 @@ public class UserEntity {
         this.role = role;
     }
 
-    public Long getUser_id() {
-        return user_id;
+    public Long getId() {
+        return id;
     }
 
-    public void setUser_id(Long user_id) {
-        this.user_id = user_id;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getName() {

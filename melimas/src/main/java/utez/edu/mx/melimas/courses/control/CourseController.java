@@ -3,10 +3,13 @@ package utez.edu.mx.melimas.courses.control;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import utez.edu.mx.melimas.courses.model.CourseDTO;
 import utez.edu.mx.melimas.courses.model.CourseService;
+import utez.edu.mx.melimas.courses.model.EnrollmentRequestDTO;
 import utez.edu.mx.melimas.utils.Message;
 import utez.edu.mx.melimas.utils.TypesResponse;
 
@@ -16,7 +19,7 @@ import java.io.IOException;
 @RequestMapping("/api/courses")
 public class CourseController {
     private final CourseService courseService;
-    private MultipartFile  file;
+    private MultipartFile file;
 
     @Autowired
     public CourseController(CourseService courseService) {
@@ -39,7 +42,7 @@ public class CourseController {
         dto.setDuration(duration);
         dto.setTeacherId(teacherId);
         dto.setCategoryId(categoryId);
-        return courseService.save(dto,file);
+        return courseService.save(dto, file);
     }
 
     @GetMapping("/findAll")
@@ -55,11 +58,8 @@ public class CourseController {
     @PreAuthorize("hasRole('TEACHER')")
     @PutMapping("/update-course/{id}")
     public ResponseEntity<Message> update(
-            @PathVariable Long id,
-            @RequestParam("name") String name,
-            @RequestParam("description") String description,
-            @RequestParam("duration") int duration,
-            @RequestParam(value = "categoryId", required = false) Long categoryId,
+            @PathVariable Long id, @RequestParam("name") String name, @RequestParam("description") String description,
+            @RequestParam("duration") int duration, @RequestParam(value = "categoryId", required = false) Long categoryId,
             @RequestParam(value = "syllabus", required = false) String syllabus,
             @RequestParam(value = "file", required = false) MultipartFile file
     ) throws IOException {
@@ -88,6 +88,19 @@ public class CourseController {
         } catch (IOException e) {
             return ResponseEntity.status(500).body(new Message("Failed to upload image", null, TypesResponse.ERROR));
         }
+    }
+
+    @PreAuthorize("hasRole('STUDENT')")
+    @PostMapping("/enroll")
+    public ResponseEntity<Message> enroll(@RequestBody EnrollmentRequestDTO request, @AuthenticationPrincipal UserDetails userDetails) {
+        String email = userDetails.getUsername();
+        return courseService.enrollStudentByEmail(request.getCourseId(), email);
+    }
+
+    @PreAuthorize("hasRole('STUDENT')")
+    @DeleteMapping("/{courseId}/unenroll")
+    public ResponseEntity<Message> unenroll(@PathVariable Long courseId, @RequestParam Long studentId) {
+        return courseService.unenrollStudent(courseId, studentId);
     }
 
 }

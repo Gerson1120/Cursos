@@ -10,7 +10,7 @@ import java.util.List;
 public interface CourseRepository extends JpaRepository<CourseEntity, Long> {
     @Query("SELECT new utez.edu.mx.melimas.courses.model.CourseSimpleDTO(" +
             "c.id, c.name, c.description, c.imageUrl, c.enabled, " +
-            "cat.id, cat.name, t.user_id, CONCAT(t.name, ' ', t.lastName)) " +
+            "cat.id, cat.name, t.id, CONCAT(t.name, ' ', t.lastName)) " +
             "FROM CourseEntity c " +
             "JOIN c.teacher t " +
             "LEFT JOIN c.category cat " +

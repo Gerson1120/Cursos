@@ -32,14 +32,16 @@ public class CourseService {
     private final CourseRepository courseRepository;
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
+    private final CourseStudentRepository enrollmentRepository;
 
     private static final Logger log = LoggerFactory.getLogger(CourseService.class);
 
     @Autowired
-    public CourseService(CourseRepository courseRepository, UserRepository userRepository, CategoryRepository categoryRepository) {
+    public CourseService(CourseRepository courseRepository, UserRepository userRepository, CategoryRepository categoryRepository, CourseStudentRepository enrollmentRepository) {
         this.courseRepository = courseRepository;
         this.userRepository = userRepository;
         this.categoryRepository = categoryRepository;
+        this.enrollmentRepository = enrollmentRepository;
     }
 
     @Transactional(rollbackFor = SQLException.class)
@@ -132,10 +134,43 @@ public class CourseService {
             return new ResponseEntity<>(new Message("Course not found", TypesResponse.WARNING), HttpStatus.NOT_FOUND);
 
         CourseEntity course = optional.get();
-        course.setEnabled(false);
+        course.setEnabled(!course.isEnabled());
         courseRepository.saveAndFlush(course);
         return new ResponseEntity<>(new Message("Course disabled", TypesResponse.SUCCESS), HttpStatus.OK);
     }
+
+    @Transactional(rollbackFor = SQLException.class)
+    public ResponseEntity<Message> enrollStudent(Long courseId, Long studentId) {
+        Optional<CourseEntity> courseOpt = courseRepository.findById(courseId);
+        Optional<UserEntity> studentOpt = userRepository.findById(studentId);
+
+        if (courseOpt.isEmpty() || studentOpt.isEmpty()) {
+            return new ResponseEntity<>(new Message("Course or student not found", TypesResponse.WARNING), HttpStatus.NOT_FOUND);
+        }
+
+        CourseEntity course = courseOpt.get();
+        if (!course.isEnabled()) {
+            return new ResponseEntity<>(new Message("Course is disabled", TypesResponse.WARNING), HttpStatus.BAD_REQUEST);
+        }
+
+        UserEntity student = studentOpt.get();
+        CourseStudentEntity enrollment = new CourseStudentEntity();
+        enrollment.setCourse(course);
+        enrollment.setStudent(student);
+        enrollmentRepository.save(enrollment);
+        return new ResponseEntity<>(new Message("Student enrolled", TypesResponse.SUCCESS), HttpStatus.OK);
+    }
+
+    @Transactional(rollbackFor = SQLException.class)
+    public ResponseEntity<Message> unenrollStudent(Long courseId, Long studentId) {
+        Optional<CourseStudentEntity> enrollmentOpt = enrollmentRepository.findByCourseIdAndStudent_Id(courseId, studentId);
+        if (enrollmentOpt.isEmpty()) {
+            return new ResponseEntity<>(new Message("Enrollment not found", TypesResponse.WARNING), HttpStatus.NOT_FOUND);
+        }
+        enrollmentRepository.delete(enrollmentOpt.get());
+        return new ResponseEntity<>(new Message("Student unenrolled", TypesResponse.SUCCESS), HttpStatus.OK);
+    }
+
     public String saveImage(MultipartFile file) throws IOException {
         String uploadDir = "uploads/courses/";
         String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
@@ -151,4 +186,28 @@ public class CourseService {
         return "/uploads/courses/" + fileName;
     }
 
+    public ResponseEntity<Message> enrollStudentByEmail(Long courseId, String email) {
+        Optional<CourseEntity> courseOpt = courseRepository.findById(courseId);
+        Optional<UserEntity> studentOpt = userRepository.findByEmail(email);
+
+        if (courseOpt.isEmpty() || studentOpt.isEmpty()) {
+            return new ResponseEntity<>(new Message("Course or student not found", TypesResponse.WARNING), HttpStatus.NOT_FOUND);
+        }
+
+        CourseEntity course = courseOpt.get();
+        if (!course.isEnabled()) {
+            return new ResponseEntity<>(new Message("Course is disabled", TypesResponse.WARNING), HttpStatus.BAD_REQUEST);
+        }
+
+        UserEntity student = studentOpt.get();
+        if (enrollmentRepository.findByCourseIdAndStudent_Id(courseId, student.getId()).isPresent()) {
+            return new ResponseEntity<>(new Message("Already enrolled", TypesResponse.WARNING), HttpStatus.CONFLICT);
+        }
+
+        CourseStudentEntity enrollment = new CourseStudentEntity();
+        enrollment.setCourse(course);
+        enrollment.setStudent(student);
+        enrollmentRepository.save(enrollment);
+        return new ResponseEntity<>(new Message("Student enrolled", TypesResponse.SUCCESS), HttpStatus.OK);
+    }
 }
