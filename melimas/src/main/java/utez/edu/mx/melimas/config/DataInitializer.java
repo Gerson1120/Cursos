@@ -56,7 +56,7 @@ public class DataInitializer implements CommandLineRunner{
         if (!userRepository.existsByEmail("admin@gmail.com")) {
             UserEntity admin = new UserEntity(
                     "Admin", "Test", "User",
-                    "admin@gmail.com", passwordEncoder.encode("1234"),
+                    "admin@gmail.com", "0123456789",passwordEncoder.encode("1234"),
                     true,
                     roleRepository.findByRoleEnum(RoleEnum.ADMIN).get()
             );
@@ -65,8 +65,8 @@ public class DataInitializer implements CommandLineRunner{
 
         if (!userRepository.existsByEmail("student@gmail.com")) {
             UserEntity student = new UserEntity(
-                    "Student", "Test", "User",
-                    "student@gmail.com", passwordEncoder.encode("1234"),
+                    "Student", "Test", "User","student@gmail.com",
+                    "0123456789", passwordEncoder.encode("1234"),
                     true,
                     roleRepository.findByRoleEnum(RoleEnum.STUDENT).get()
             );
@@ -76,7 +76,7 @@ public class DataInitializer implements CommandLineRunner{
         if (!userRepository.existsByEmail("teacher@gmail.com")) {
             UserEntity teacher = new UserEntity(
                     "Teacher", "Test", "User",
-                    "teacher@gmail.com", passwordEncoder.encode("1234"),
+                    "teacher@gmail.com", "0123456789",passwordEncoder.encode("1234"),
                     true,
                     roleRepository.findByRoleEnum(RoleEnum.TEACHER).get()
             );
@@ -102,7 +102,7 @@ public class DataInitializer implements CommandLineRunner{
 
             CourseEntity curso1 = new CourseEntity(
                     "Curso Java Básico",
-                    "Aprende los fundamentos de Java desde cero",
+                    "Aprende los fundamentos de Java desde cero","",
                     15,
                     IMAGE_BASE_PATH+ "java.png",
                     true,
@@ -124,7 +124,7 @@ public class DataInitializer implements CommandLineRunner{
             // Repetir para otros cursos
             CourseEntity curso2 = new CourseEntity(
                     "Curso HTML y CSS",
-                    "Diseño web con HTML5 y CSS3",
+                    "Diseño web con HTML5 y CSS3","",
                     10, IMAGE_BASE_PATH+"html_css.png",
                     true,
                     categoria,
@@ -135,7 +135,7 @@ public class DataInitializer implements CommandLineRunner{
 
             CourseEntity curso3 = new CourseEntity(
                     "Curso de Finanzas para Jóvenes",
-                    "Aprende a manejar tu dinero",
+                    "Aprende a manejar tu dinero","",
                      8,  IMAGE_BASE_PATH+"finanzas.png",
                     true,
                     categoria,

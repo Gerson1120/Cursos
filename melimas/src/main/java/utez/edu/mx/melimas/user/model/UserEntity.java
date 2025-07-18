@@ -14,7 +14,6 @@ public class UserEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-
     @Column(name = "name", nullable = false,columnDefinition = "VARCHAR(30)")
     private String name;
 
@@ -26,6 +25,9 @@ public class UserEntity {
 
     @Column(name = "email", nullable = false, length = 50)
     private String email;
+
+    @Column(name = "phone", nullable = false, length = 10)
+    private String phone;
 
     @Column(name = "password", nullable = false, length = 255)
     private String password;
@@ -44,24 +46,39 @@ public class UserEntity {
     public UserEntity() {
     }
 
-    public UserEntity(Long id, String name, String lastName, String surname, String email, String password, boolean status, RoleEntity role) {
+    public UserEntity(Long id, String name, String lastName, String surname, String email, String phone, String password, boolean isStatusActive, RoleEntity role, List<CourseStudentEntity> enrolledCourses) {
         this.id = id;
         this.name = name;
         this.lastName = lastName;
         this.surname = surname;
         this.email = email;
+        this.phone = phone;
         this.password = password;
-        this.isStatusActive = status;
+        this.isStatusActive = isStatusActive;
         this.role = role;
+        this.enrolledCourses = enrolledCourses;
     }
 
-    public UserEntity(String name, String lastName, String surname, String email, String password, boolean status, RoleEntity role) {
+    public UserEntity(String name, String lastName, String surname, String email, String phone, String password, boolean isStatusActive, RoleEntity role, List<CourseStudentEntity> enrolledCourses) {
         this.name = name;
         this.lastName = lastName;
         this.surname = surname;
         this.email = email;
+        this.phone = phone;
         this.password = password;
-        this.isStatusActive = status;
+        this.isStatusActive = isStatusActive;
+        this.role = role;
+        this.enrolledCourses = enrolledCourses;
+    }
+
+    public UserEntity(String name, String lastName, String surname, String email, String phone, String password, boolean isStatusActive, RoleEntity role) {
+        this.name = name;
+        this.lastName = lastName;
+        this.surname = surname;
+        this.email = email;
+        this.phone = phone;
+        this.password = password;
+        this.isStatusActive = isStatusActive;
         this.role = role;
     }
 
@@ -127,5 +144,13 @@ public class UserEntity {
 
     public void setRoles(RoleEntity role) {
         this.role = role;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 }

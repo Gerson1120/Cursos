@@ -1,9 +1,20 @@
 package utez.edu.mx.melimas.categories.model;
 
+import jakarta.validation.constraints.Pattern;
+
 public class CategoryDTO {
     private Long id;
+    @Pattern(
+            regexp = "^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9 \\-]{3,100}$",
+            message = "El nombre debe tener entre 3 y 100 caracteres y solo puede contener letras, números, espacios y guiones."
+    )
     private String name;
+    @Pattern(
+            regexp = "^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9 ,.\\-()!¡¿?\"']{0,255}$",
+            message = "La descripción no debe exceder los 255 caracteres y solo puede contener caracteres válidos."
+    )
     private String description;
+
     private Boolean enabled;
 
     public CategoryDTO() {

@@ -3,7 +3,9 @@ package utez.edu.mx.melimas.courses.control;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -113,4 +115,11 @@ public class CourseController {
     }
 
 
+    @PreAuthorize("hasRole('STUDENT')")
+    @GetMapping("/my-courses")
+    public ResponseEntity<Message> getMyCourses() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String email = auth.getName();
+        return courseService.getCoursesByStudentEmail(email);
+    }
 }

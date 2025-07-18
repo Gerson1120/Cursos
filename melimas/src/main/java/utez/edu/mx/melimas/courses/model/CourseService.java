@@ -251,4 +251,16 @@ public class CourseService {
         return new ResponseEntity<>(new Message("Enrolled students", students, TypesResponse.SUCCESS), HttpStatus.OK);
     }
 
+    public ResponseEntity<Message> getCoursesByStudentEmail(String email) {
+        Optional<UserEntity> optionalUser = userRepository.findByEmail(email);
+        if (optionalUser.isEmpty()) {
+            return new ResponseEntity<>(new Message("Estudiante no encontrado", null, TypesResponse.WARNING), HttpStatus.NOT_FOUND);
+        }
+
+        List<CourseSimpleDTO> courses  = enrollmentRepository.findCoursesByStudentEmail(email);
+
+        // Puedes devolver los cursos como DTO si quieres evitar enviar objetos grandes
+        return new ResponseEntity<>(new Message("Cursos inscritos", courses, TypesResponse.SUCCESS), HttpStatus.OK);
+    }
+
 }

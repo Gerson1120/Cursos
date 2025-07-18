@@ -1,5 +1,6 @@
 package utez.edu.mx.melimas.categories.control;
 
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -23,7 +24,7 @@ public class CategoryController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/save")
-    public ResponseEntity<Message> saveCategory(@RequestBody CategoryDTO dto) {
+    public ResponseEntity<Message> saveCategory(@Valid @RequestBody CategoryDTO dto) {
         return categoryService.create(dto);
     }
 
@@ -39,7 +40,7 @@ public class CategoryController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/update/{id}")
-    public ResponseEntity<Message> update(@PathVariable Long id, @RequestBody CategoryDTO dto) {
+    public ResponseEntity<Message> update(@PathVariable Long id, @Valid @RequestBody CategoryDTO dto) {
         return categoryService.update(id, dto);
     }
 

@@ -1,10 +1,10 @@
 package utez.edu.mx.melimas.auth;
 
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import utez.edu.mx.melimas.user.model.UserDTO;
-import utez.edu.mx.melimas.user.model.UserEntity;
 
 @RestController
 @RequestMapping("/cursos/auth")
@@ -20,7 +20,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody UserDTO nuevo) {
+    public ResponseEntity<?> register(@Valid @RequestBody UserDTO nuevo) {
         return authService.register(nuevo);
     }
 }

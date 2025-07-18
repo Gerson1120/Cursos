@@ -15,6 +15,7 @@ import utez.edu.mx.melimas.utils.Message;
 import utez.edu.mx.melimas.utils.TypesResponse;
 
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -53,6 +54,7 @@ public class UserService {
         user.setLastName(dto.getLastName());
         user.setSurname(dto.getSurname());
         user.setEmail(dto.getEmail());
+        user.setPhone(dto.getPhone());
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
         user.setStatusActive(true);
         user.setRoles(role.get());
@@ -100,12 +102,60 @@ public class UserService {
         if (optionalUser.isEmpty()) {
             return new ResponseEntity<>(new Message("Usuario no encontrado", TypesResponse.WARNING), HttpStatus.NOT_FOUND);
         }
-
         UserEntity user = optionalUser.get();
-        user.setStatusActive(false);
+        user.setStatusActive(!user.getStatusActive());
         repository.saveAndFlush(user);
         log.info("Usuario con ID {} dado de baja (borrado lógico)", id);
 
         return new ResponseEntity<>(new Message("Usuario desactivado correctamente", TypesResponse.SUCCESS), HttpStatus.OK);
+    }
+
+    public ResponseEntity<Message> getUserProfileByEmail(String email) {
+        Optional<UserEntity> optionalUser = repository.findByEmail(email);
+        if (optionalUser.isPresent()) {
+            UserEntity user = optionalUser.get();
+            UserEntity clone = new UserEntity();
+            clone.setId(user.getId());
+            clone.setName(user.getName());
+            clone.setLastName(user.getLastName());
+            clone.setSurname(user.getSurname());
+            clone.setEmail(user.getEmail());
+            clone.setPhone(user.getPhone());
+            clone.setStatusActive(user.getStatusActive());
+            clone.setRoles(user.getRol());
+
+            return ResponseEntity.ok(new Message("Perfil encontrado", clone, TypesResponse.SUCCESS));
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new Message("Usuario no encontrado", null, TypesResponse.WARNING));
+        }
+    }
+    @Transactional
+    public ResponseEntity<Message> updatePassword(String email, String newPassword) {
+        Optional<UserEntity> optionalUser = repository.findByEmail(email);
+        if (optionalUser.isEmpty()) {
+            return new ResponseEntity<>(new Message("Usuario no encontrado", null, TypesResponse.WARNING), HttpStatus.NOT_FOUND);
+        }
+
+        UserEntity user = optionalUser.get();
+        String hashed = passwordEncoder.encode(newPassword);
+        user.setPassword(hashed);
+        repository.save(user);
+
+        return new ResponseEntity<>(new Message("Contraseña actualizada", null, TypesResponse.SUCCESS), HttpStatus.OK);
+    }
+
+
+    public ResponseEntity<Message> findByRol(String rol){
+        RoleEnum roleEnum = RoleEnum.valueOf(rol);
+
+        Optional<RoleEntity> role = roleRepository.findByRoleEnum(roleEnum);
+        if (role.isEmpty() || !role.isPresent()) {
+            return new ResponseEntity<>(new Message("Rol inválido", null, TypesResponse.ERROR), HttpStatus.BAD_REQUEST);
+        }
+
+        List<UserEntity> userEntityList = repository.findAllByRole(role.get());
+        return  new ResponseEntity<>(new Message("Usuarios por rol encontrados",userEntityList,TypesResponse.SUCCESS),HttpStatus.OK);
+
     }
 }

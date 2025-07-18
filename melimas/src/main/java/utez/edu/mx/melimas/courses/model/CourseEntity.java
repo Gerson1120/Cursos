@@ -21,7 +21,7 @@ public class CourseEntity {
     @Column(nullable = false)
     private String description;
 
-//    private String syllabus;
+    private String syllabus;
 
     private int duration;
 
@@ -45,10 +45,11 @@ public class CourseEntity {
     public CourseEntity() {
     }
 
-    public CourseEntity(Long id, String name, String description,  int duration, String imageUrl, boolean enabled, CategoryEntity category, UserEntity teacher, List<CourseStudentEntity> enrollments) {
+    public CourseEntity(Long id, String name, String description, String syllabus, int duration, String imageUrl, boolean enabled, CategoryEntity category, UserEntity teacher, List<CourseStudentEntity> enrollments) {
         this.id = id;
         this.name = name;
         this.description = description;
+        this.syllabus = syllabus;
         this.duration = duration;
         this.imageUrl = imageUrl;
         this.enabled = enabled;
@@ -57,9 +58,10 @@ public class CourseEntity {
         this.enrollments = enrollments;
     }
 
-    public CourseEntity(String name, String description,  int duration, String imageUrl, boolean enabled, CategoryEntity category, UserEntity teacher, List<CourseStudentEntity> enrollments) {
+    public CourseEntity(String name, String description, String syllabus, int duration, String imageUrl, boolean enabled, CategoryEntity category, UserEntity teacher, List<CourseStudentEntity> enrollments) {
         this.name = name;
         this.description = description;
+        this.syllabus = syllabus;
         this.duration = duration;
         this.imageUrl = imageUrl;
         this.enabled = enabled;
@@ -138,5 +140,13 @@ public class CourseEntity {
 
     public void setEnrollments(List<CourseStudentEntity> enrollments) {
         this.enrollments = enrollments;
+    }
+
+    public String getSyllabus() {
+        return syllabus;
+    }
+
+    public void setSyllabus(String syllabus) {
+        this.syllabus = syllabus;
     }
 }
