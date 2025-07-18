@@ -10,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 import utez.edu.mx.melimas.courses.model.CourseDTO;
 import utez.edu.mx.melimas.courses.model.CourseService;
 import utez.edu.mx.melimas.courses.model.EnrollmentRequestDTO;
+import utez.edu.mx.melimas.courses.model.studentCourse.CourseViewRequestDTO;
 import utez.edu.mx.melimas.utils.Message;
 import utez.edu.mx.melimas.utils.TypesResponse;
 
@@ -99,9 +100,17 @@ public class CourseController {
     }
 
     @PreAuthorize("hasRole('STUDENT')")
-    @DeleteMapping("/{courseId}/unenroll")
-    public ResponseEntity<Message> unenroll(@PathVariable Long courseId, @RequestParam Long studentId) {
-        return courseService.unenrollStudent(courseId, studentId);
+    @PostMapping("/unenroll")
+    public ResponseEntity<Message> unenroll(@RequestBody EnrollmentRequestDTO request, @AuthenticationPrincipal UserDetails userDetails) {
+        String email = userDetails.getUsername();
+        return courseService.unenrollStudentByEmail(request.getCourseId(), email);
     }
+
+    @PreAuthorize("hasRole('TEACHER')")
+    @PostMapping("/view-students")
+    public ResponseEntity<Message> viewStudents(@RequestBody CourseViewRequestDTO request, @AuthenticationPrincipal UserDetails userDetails) {
+        return courseService.getStudentsByCourseAndTeacherEmail(request.getCourseId(), userDetails.getUsername());
+    }
+
 
 }

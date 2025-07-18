@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import utez.edu.mx.melimas.categories.model.CategoryEntity;
 import utez.edu.mx.melimas.categories.model.CategoryRepository;
+import utez.edu.mx.melimas.courses.model.studentCourse.EnrolledStudentDTO;
 import utez.edu.mx.melimas.user.model.UserEntity;
 import utez.edu.mx.melimas.user.model.UserRepository;
 import utez.edu.mx.melimas.utils.Message;
@@ -161,15 +162,7 @@ public class CourseService {
         return new ResponseEntity<>(new Message("Student enrolled", TypesResponse.SUCCESS), HttpStatus.OK);
     }
 
-    @Transactional(rollbackFor = SQLException.class)
-    public ResponseEntity<Message> unenrollStudent(Long courseId, Long studentId) {
-        Optional<CourseStudentEntity> enrollmentOpt = enrollmentRepository.findByCourseIdAndStudent_Id(courseId, studentId);
-        if (enrollmentOpt.isEmpty()) {
-            return new ResponseEntity<>(new Message("Enrollment not found", TypesResponse.WARNING), HttpStatus.NOT_FOUND);
-        }
-        enrollmentRepository.delete(enrollmentOpt.get());
-        return new ResponseEntity<>(new Message("Student unenrolled", TypesResponse.SUCCESS), HttpStatus.OK);
-    }
+
 
     public String saveImage(MultipartFile file) throws IOException {
         String uploadDir = "uploads/courses/";
@@ -210,4 +203,52 @@ public class CourseService {
         enrollmentRepository.save(enrollment);
         return new ResponseEntity<>(new Message("Student enrolled", TypesResponse.SUCCESS), HttpStatus.OK);
     }
+
+    public ResponseEntity<Message> unenrollStudentByEmail(Long courseId, String email) {
+        Optional<UserEntity> studentOpt = userRepository.findByEmail(email);
+        if (studentOpt.isEmpty()) {
+            return new ResponseEntity<>(new Message("Student not found", TypesResponse.WARNING), HttpStatus.NOT_FOUND);
+        }
+
+        Optional<CourseStudentEntity> enrollmentOpt =
+                enrollmentRepository.findByCourseIdAndStudentId(courseId, studentOpt.get().getId());
+
+        if (enrollmentOpt.isEmpty()) {
+            return new ResponseEntity<>(new Message("Enrollment not found", TypesResponse.WARNING), HttpStatus.NOT_FOUND);
+        }
+
+        enrollmentRepository.delete(enrollmentOpt.get());
+        return new ResponseEntity<>(new Message("Student unenrolled", TypesResponse.SUCCESS), HttpStatus.OK);
+    }
+
+
+    public ResponseEntity<Message> getStudentsByCourseAndTeacherEmail(Long courseId, String email) {
+        Optional<CourseEntity> courseOpt = courseRepository.findById(courseId);
+        Optional<UserEntity> teacherOpt = userRepository.findByEmail(email);
+
+        if (courseOpt.isEmpty() || teacherOpt.isEmpty()) {
+            return new ResponseEntity<>(new Message("Course or teacher not found", TypesResponse.WARNING), HttpStatus.NOT_FOUND);
+        }
+
+        CourseEntity course = courseOpt.get();
+        if (!course.getTeacher().getId().equals(teacherOpt.get().getId())) {
+            return new ResponseEntity<>(new Message("You are not the owner of this course", TypesResponse.UNAUTHORIZED), HttpStatus.UNAUTHORIZED);
+        }
+
+        List<EnrolledStudentDTO> students = course.getEnrollments()
+                .stream()
+                .map(enrollment -> {
+                    UserEntity s = enrollment.getStudent();
+                    return new EnrolledStudentDTO(
+                            s.getId(),
+                            s.getName(),
+                            s.getLastName(),
+                            s.getEmail()
+                    );
+                })
+                .toList();
+
+        return new ResponseEntity<>(new Message("Enrolled students", students, TypesResponse.SUCCESS), HttpStatus.OK);
+    }
+
 }

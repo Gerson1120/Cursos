@@ -9,4 +9,5 @@ import java.util.Optional;
 public interface CourseStudentRepository extends JpaRepository<CourseStudentEntity, Long> {
     Optional<CourseStudentEntity> findByCourseIdAndStudent_Id(Long courseId, Long studentId);
 
+    Optional<CourseStudentEntity> findByCourseIdAndStudentId(Long courseId, Long id);
 }
