@@ -10,6 +10,7 @@ import utez.edu.mx.melimas.utils.Message;
 
 @RestController
 @RequestMapping("/api/users")
+@CrossOrigin(origins = "*")
 public class UserController {
     private final UserService userService;
 

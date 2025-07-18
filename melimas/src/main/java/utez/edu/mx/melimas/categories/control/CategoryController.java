@@ -11,6 +11,7 @@ import utez.edu.mx.melimas.utils.Message;
 
 @RestController
 @RequestMapping("/api/categories")
+@CrossOrigin(origins = "*")
 public class CategoryController {
 
     private final CategoryService categoryService;
