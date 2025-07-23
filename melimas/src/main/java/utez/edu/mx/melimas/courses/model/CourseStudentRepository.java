@@ -25,4 +25,5 @@ public interface CourseStudentRepository extends JpaRepository<CourseStudentEnti
             "WHERE cs.student.email = :email AND c.enabled = true")
     List<CourseSimpleDTO> findCoursesByStudentEmail(@Param("email") String email);
 
+    boolean existsByCourseIdAndStudentId(Long courseId, Long userId);
 }

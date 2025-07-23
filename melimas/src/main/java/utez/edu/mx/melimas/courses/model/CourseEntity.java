@@ -2,6 +2,7 @@ package utez.edu.mx.melimas.courses.model;
 
 import jakarta.persistence.*;
 import utez.edu.mx.melimas.categories.model.CategoryEntity;
+import utez.edu.mx.melimas.courseContent.model.CourseContentEntity;
 import utez.edu.mx.melimas.user.model.UserEntity;
 
 import java.util.ArrayList;
@@ -41,6 +42,10 @@ public class CourseEntity {
 
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CourseStudentEntity> enrollments = new ArrayList<>();
+
+    @OneToOne(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private CourseContentEntity content;
+
 
     public CourseEntity() {
     }
@@ -148,5 +153,13 @@ public class CourseEntity {
 
     public void setSyllabus(String syllabus) {
         this.syllabus = syllabus;
+    }
+
+    public CourseContentEntity getContent() {
+        return content;
+    }
+
+    public void setContent(CourseContentEntity content) {
+        this.content = content;
     }
 }

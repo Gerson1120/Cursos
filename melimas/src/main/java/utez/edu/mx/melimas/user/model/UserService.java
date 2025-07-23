@@ -5,6 +5,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -157,5 +160,29 @@ public class UserService {
         List<UserEntity> userEntityList = repository.findAllByRole(role.get());
         return  new ResponseEntity<>(new Message("Usuarios por rol encontrados",userEntityList,TypesResponse.SUCCESS),HttpStatus.OK);
 
+    }
+
+    public Long getCurrentUserId() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String email = auth.getName(); // Este es el "sub" del token (correo)
+
+        Optional<UserEntity> userOpt = repository.findByEmail(email);
+        if (userOpt.isEmpty()) {
+            throw new UsernameNotFoundException("Usuario no encontrado con email: " + email);
+        }
+
+        return userOpt.get().getId();
+    }
+    public String getCurrentUserRole() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new RuntimeException("No se encontró usuario autenticado");
+        }
+
+        String email = authentication.getName();
+        UserEntity user = repository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        return user.getRol().getRoleEnum().name();
     }
 }
